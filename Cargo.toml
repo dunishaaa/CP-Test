@@ -1,5 +1,5 @@
 [package]
-name = "CP-Test"
+name = "cp_test"
 version = "0.1.0"
 edition = "2021"
 
