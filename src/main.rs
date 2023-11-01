@@ -1,47 +1,30 @@
 mod tester;
-use std::{
-    fs,
-    process::{Command, Stdio},
-    str,
-};
-use tester::{
-    my_file::{File, FileType},
-    FilesCompare,
-};
+use tester::my_file::{File, FileType};
+
+/*
+enum FilePath {
+    CODE(String),
+    EXPECTED(String),
+    OUTPUT(String),
+    INPUT(String),
+}
+*/
 
 fn main() {
+    /*
+    let _code_path = FilePath::CODE("src/tests/cowSign.cpp".to_string());
+    let _expected_path = FilePath::EXPECTED("src/tests/expected".to_string());
+    let _output_path = FilePath::OUTPUT("src/tests/a.out".to_string());
+    let _input_path = FilePath::INPUT("src/tests/a.in".to_string());
+    */
     let input_values = File::new(FileType::INPUT, "src/tests/a.in");
-    let compilation_status = Command::new("g++")
-        .arg("src/tests/cowSign.cpp")
-        .arg("-o")
-        .arg("src/tests/main")
-        .status()
-        .expect("Valio burguer");
+    let code = File::new(FileType::CODE, "src/tests/cowSign.cpp");
 
-    if compilation_status.success() {
+    if code.compile() {
         println!("Compilation succesful. Now testing...");
-        let input = Command::new("echo")
-            .arg(input_values.content)
-            .stdout(Stdio::piped())
-            .spawn()
-            .expect("Failed to create process");
-        let echo_out = input.stdout.expect("Failed to open process");
-
-        let test = Command::new("./src/tests/main")
-            .stdin(Stdio::from(echo_out))
-            .stdout(Stdio::piped())
-            .spawn()
-            .expect("Hijole");
-        let ans = test
-            .wait_with_output()
-            .expect("Failed to retreive answer output")
-            .stdout;
-        let idk = str::from_utf8(&ans).unwrap();
-        fs::write("src/tests/a.out", idk).expect("Could not write to file!");
+        input_values.run_code();
         let expected_output = File::new(FileType::EXPECTED, "src/tests/expected");
-        let output_values = File::new(FileType::OUTPUT, "src/tests/a.out");
-        let test = FilesCompare::new(expected_output, output_values);
-        if test.test() {
+        if expected_output.run_test() {
             println!("Passed");
         } else {
             println!("Failed");

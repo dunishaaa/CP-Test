@@ -5,6 +5,7 @@ pub struct FilesCompare {
     actual_output: File,
 }
 
+#[allow(dead_code)]
 impl FilesCompare {
     pub fn new(expected: File, actual_output: File) -> Self {
         FilesCompare {
@@ -25,9 +26,8 @@ impl FilesCompare {
             .split(' ')
             .filter(|x| x != &"\n")
             .collect::<Vec<&str>>();
-
         println!("{:?}", expected_cos);
         println!("{:?}", actual_cos);
-        self.expected.content == self.actual_output.content
+        expected_cos == actual_cos
     }
 }
