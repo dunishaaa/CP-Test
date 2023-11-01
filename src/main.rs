@@ -1,35 +1,25 @@
 mod tester;
-use tester::{File, FileType};
-
-/*
-enum FilePath {
-    CODE(String),
-    EXPECTED(String),
-    OUTPUT(String),
-    INPUT(String),
-}
-*/
+use std::env;
+use tester::{my_file::File, my_file::FileType, Test};
 
 fn main() {
-    /*
-    let _code_path = FilePath::CODE("src/tests/cowSign.cpp".to_string());
-    let _expected_path = FilePath::EXPECTED("src/tests/expected".to_string());
-    let _output_path = FilePath::OUTPUT("src/tests/a.out".to_string());
-    let _input_path = FilePath::INPUT("src/tests/a.in".to_string());
-    */
-    let input_values = File::new(FileType::INPUT, "src/tests/a.in");
-    let code = File::new(FileType::CODE, "src/tests/cowSign.cpp");
+    let args: Vec<String> = env::args().collect();
+    let mut input = File::new(FileType::INPUT, "src/tests/a.in");
+    let mut code = File::new(FileType::CODE, "src/tests/cowSign.cpp");
+    let expected = File::new(FileType::EXPECTED, "src/tests/expected");
 
-    if code.compile() {
-        println!("Compilation succesful. Now testing...");
-        input_values.run_code();
-        let expected_output = File::new(FileType::EXPECTED, "src/tests/expected");
-        if expected_output.run_test() {
-            println!("Passed");
-        } else {
-            println!("Failed");
-        }
+    if args.len() > 1 {
+        println!("{:?}", &args[1..]);
+        code = File::new(FileType::CODE, &args[1]);
+        input = File::new(FileType::INPUT, &args[2]);
+    }
+    let mut test: Test = Test::new(input, code, expected, File::empty_output());
+    test.compile();
+    test.run_code();
+    test.output = File::new(FileType::OUTPUT, "src/tests/a.out");
+    if test.run_test() {
+        println!("Passed!");
     } else {
-        println!("Compilation unsuccesful:(((");
+        println!("Failed:((");
     }
 }

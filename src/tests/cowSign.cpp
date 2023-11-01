@@ -16,5 +16,5 @@ int main() {
   cin.tie(0);
   ios_base::sync_with_stdio(0);
   int n=3, k=9; cin >> n >> k;
-  fore(i, n, k) cout << i << ' '; cout << '\n';
+  fore(i, n, k) cout << 2*i << ' '; cout << '\n';
 }
