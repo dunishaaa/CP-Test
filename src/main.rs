@@ -1,5 +1,5 @@
 mod tester;
-use tester::my_file::{File, FileType};
+use tester::{File, FileType};
 
 /*
 enum FilePath {
