@@ -1,45 +1,24 @@
+mod tester;
 use std::{
     fs,
     process::{Command, Stdio},
     str,
 };
-#[derive(Debug)]
-#[allow(dead_code)]
-enum FileType {
-    INPUT,
-    EXPECTED,
-    CODE,
-    OUTPUT,
-}
-
-#[derive(Debug)]
-#[allow(dead_code)]
-struct File {
-    file_type: FileType,
-    content: String,
-}
-impl File {
-    fn new(file_type: FileType, file: &str) -> Self {
-        File {
-            file_type,
-            content: fs::read_to_string(file).expect("Not found!!!"),
-        }
-    }
-}
+use tester::{
+    my_file::{File, FileType},
+    FilesCompare,
+};
 
 fn main() {
     let input_values = File::new(FileType::INPUT, "src/tests/a.in");
-    let expected_output = File::new(FileType::EXPECTED, "src/tests/expected");
-    println!("{:}", &input_values.content);
-    //    println!("{:}", &expected_output.content);
-    let status = Command::new("g++")
+    let compilation_status = Command::new("g++")
         .arg("src/tests/cowSign.cpp")
         .arg("-o")
         .arg("src/tests/main")
         .status()
         .expect("Valio burguer");
 
-    if status.success() {
+    if compilation_status.success() {
         println!("Compilation succesful. Now testing...");
         let input = Command::new("echo")
             .arg(input_values.content)
@@ -53,8 +32,20 @@ fn main() {
             .stdout(Stdio::piped())
             .spawn()
             .expect("Hijole");
-        let ans = test.wait_with_output().expect("kk").stdout;
+        let ans = test
+            .wait_with_output()
+            .expect("Failed to retreive answer output")
+            .stdout;
         let idk = str::from_utf8(&ans).unwrap();
+        fs::write("src/tests/a.out", idk).expect("Could not write to file!");
+        let expected_output = File::new(FileType::EXPECTED, "src/tests/expected");
+        let output_values = File::new(FileType::OUTPUT, "src/tests/a.out");
+        let test = FilesCompare::new(expected_output, output_values);
+        if test.test() {
+            println!("Passed");
+        } else {
+            println!("Failed");
+        }
     } else {
         println!("Compilation unsuccesful:(((");
     }
