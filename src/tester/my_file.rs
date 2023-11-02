@@ -2,7 +2,6 @@ use std::fs;
 #[derive(Debug)]
 #[allow(dead_code)]
 pub enum FileType {
-    CODE,
     INPUT,
     EXPECTED,
     OUTPUT,
@@ -14,6 +13,18 @@ pub struct File {
     pub file_type: FileType,
     pub path: String,
     pub content: String,
+}
+#[derive(Debug)]
+#[allow(dead_code)]
+pub struct Code {
+    pub path: String,
+}
+impl Code {
+    pub fn new(path: &str) -> Self {
+        Code {
+            path: path.to_string(),
+        }
+    }
 }
 impl File {
     pub fn new(file_type: FileType, path: &str) -> Self {
@@ -27,6 +38,13 @@ impl File {
     pub fn empty_output() -> Self {
         File {
             file_type: FileType::OUTPUT,
+            path: String::new(),
+            content: String::new(),
+        }
+    }
+    pub fn empty_expected() -> Self {
+        File {
+            file_type: FileType::EXPECTED,
             path: String::new(),
             content: String::new(),
         }
