@@ -17,4 +17,5 @@ fn main() {
     } else {
         println!("{}", "ERROR: Failed to compile".color("red"));
     }
+    //hola
 }
